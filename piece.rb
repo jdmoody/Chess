@@ -1,11 +1,20 @@
 require './board.rb'
 
 class Piece
+  COLORS = {
+
+    :white => :bottom,
+    :black => :top
+
+  }
+  attr_accessor :position
+
   HORIZ_VERT =   [[1, 0], [-1, 0], [0,  1], [0,  -1]]
   DIAGONALS = [[1, 1], [-1, 1], [1, -1], [-1, -1]]
-  def initialize(position, board)
+  def initialize(position, board, color)
     @position = position
     @board = board
+    @color = color
   end
 end
 
