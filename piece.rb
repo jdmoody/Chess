@@ -1,21 +1,30 @@
-require './board.rb'
+require 'colorize'
 
 class Piece
-  COLORS = {
-
-    :white => :bottom,
-    :black => :top
-
-  }
-  attr_accessor :position
+  attr_accessor :position, :color
 
   HORIZ_VERT =   [[1, 0], [-1, 0], [0,  1], [0,  -1]]
   DIAGONALS = [[1, 1], [-1, 1], [1, -1], [-1, -1]]
+
   def initialize(position, board, color)
     @position = position
     @board = board
     @color = color
   end
+
+  def valid?(new_pos)
+    return false unless in_bounds(new_pos)
+    occupant = @board[new_pos]
+    return true if occupant == nil
+    occupant.color == self.color ? false : true
+  end
+
+  def in_bounds(new_pos)
+    new_pos.all? do |row_or_col|
+      row_or_col.between?(0, 7)
+    end
+  end
+
 end
 
 class SlidingPiece < Piece
@@ -24,10 +33,11 @@ class SlidingPiece < Piece
     all_positions = []
     self.move_dirs.map do |pos_change|
       new_pos = @position.dup
-      8.times do#until @board[@position].occupied?
+      loop do
         new_pos = new_pos.dup
         new_pos[0] += pos_change[0]
         new_pos[1] += pos_change[1]
+        break unless self.valid?(new_pos)
         all_positions << new_pos
       end
     end
@@ -39,11 +49,19 @@ class Bishop < SlidingPiece
   def move_dirs
     DIAGONALS
   end
+
+  def to_s
+    "B"
+  end
 end
 
 class Rook < SlidingPiece
   def move_dirs
     HORIZ_VERT
+  end
+
+  def to_s
+    "R"
   end
 end
 
@@ -51,13 +69,17 @@ class Queen < SlidingPiece
   def move_dirs
     DIAGONALS + HORIZ_VERT
   end
+
+  def to_s
+    "Q"
+  end
 end
 
 class SteppingPiece < Piece
   def moves
     self.move_dirs.map do |pos|
-    [@position[0] + pos[0], @position[1] + pos[1]]
-    end
+      [@position[0] + pos[0], @position[1] + pos[1]]
+    end.select { |pos| self.valid?(pos) }
   end
 end
 
@@ -65,11 +87,19 @@ class King < SteppingPiece
   def move_dirs
     HORIZ_VERT + DIAGONALS
   end
+
+  def to_s
+    "K"
+  end
 end
 
 class Knight < SteppingPiece
   def move_dirs
     [[-1, 2], [-1, -2], [1, -2], [1, 2], [2, -1], [-2, -1], [-2, 1], [2, 1]]
+  end
+
+  def to_s
+    "H"
   end
 end
 
@@ -77,11 +107,14 @@ class Pawn < SteppingPiece
   def move_dirs
     white? ? [0, 1] : [0, -1]
   end
+
+  def to_s
+    "P"
+  end
 end
 
 # knight = Knight.new([0,0], nil)
 # p knight.moves.inspect
 
-queen = Bishop.new([0,0], nil)
-p queen.moves.inspect
-
+# queen = Bishop.new([0,0], nil, :black)
+# p queen.to_s
