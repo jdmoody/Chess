@@ -26,8 +26,9 @@ class Piece
   end
 
   def move_into_check?(pos)
-
-
+    dup_board = self.board.dup
+    dup_board.move(self.position, pos)
+    dup_board.in_check?(self.color) ? true : false
   end
 end
 
