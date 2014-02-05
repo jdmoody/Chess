@@ -58,6 +58,11 @@ class Board
     end
   end
 
+  def convert_pos_to_coords(pos)
+    letter = (pos[0] + 97).chr
+    number = 8 - pos[0]
+    "#{letter}#{number}"
+  end
   def dup
     copy = Board.dup
 
@@ -94,7 +99,12 @@ class Board
   end
 
   def move(start, end_pos, color)
+    start_coord = self.convert_pos_to_coords(start)
+    end_coord = self.convert_pos_to_coords(end_pos)
+    raise MoveStartError.new(start_coord) unless self.occupied?(start)
+    raise MoveEndError.new(end_coord) unless self[start].moves.include?(end_pos)
     occupant = self[start]
+    raise WrongPlayerError.new unless color == occupant.color
     if occupant.valid_moves.include?(end_pos)
       move!(start, end_pos, color)
     end
@@ -102,10 +112,9 @@ class Board
   end
 
   def move!(start, end_pos, color)
-    raise MoveStartError.new("#{start}") unless self.occupied?(start)
-    raise MoveEndError.new("#{end_pos}") unless self[start].moves.include?(end_pos)
+
     occupant = self[start]
-    raise WrongPlayerError.new unless color == occupant.color
+
     self[end_pos] = nil
     self[end_pos] = occupant
     self[start] = nil
