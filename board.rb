@@ -5,9 +5,12 @@ class Board
 
   def initialize
     @grid = Array.new(8) { Array.new(8) { nil } }
-    [:red, :white].each do |color|
-      self.place_pawns(color)
-      self.place_other_pieces(color)
+    @pieces = {
+      :red => self.create_pieces(:red),
+      :white => self.create_pieces(:white)
+    }
+    @pieces.each do |color, _ |
+      self.place_pieces(color)
     end
   end
 
@@ -19,25 +22,34 @@ class Board
     end.join("\n")
   end
 
-  def place_other_pieces(color)
-    #pass in y instead?
-    col = (color == :white) ? 7 : 0
-    self[[0,col]] = Rook.new([0,col], self, color)
-    self[[1,col]] = Bishop.new([1,col], self, color)
-    self[[2,col]] = Knight.new([2,col], self, color)
-    self[[3,col]] = Queen.new([3,col], self, color)
-    self[[4,col]] = King.new([4,col], self, color)
-    self[[5,col]] = Knight.new([5,col], self, color)
-    self[[6,col]] = Bishop.new([6,col], self, color)
-    self[[7,col]] = Rook.new([7,col], self, color)
+  def create_pawns(color)
+    [].tap do | pawns |
+      (0...8).each do |row|
+        col = (color == :white) ? 6 : 1
+        pos = [row, col]
+        pawns << Pawn.new(pos, self, color)
+      end
+    end
   end
 
-  def place_pawns(color)
-    (0...8).each do |row|
-      col = (color == :white) ? 6 : 1
-      pos = [row, col]
-      pawn = Pawn.new(pos, self, color)
-      self[pos] = pawn
+  def create_pieces(color)
+    col = (color == :white) ? 7 : 0
+    [].tap do |all_pieces|
+      all_pieces << Rook.new([0,col], self, color)
+      all_pieces << Bishop.new([1,col], self, color)
+      all_pieces << Knight.new([2,col], self, color)
+      all_pieces << Queen.new([3,col], self, color)
+      all_pieces << King.new([4,col], self, color)
+      all_pieces << Knight.new([5,col], self, color)
+      all_pieces << Bishop.new([6,col], self, color)
+      all_pieces << Rook.new([7,col], self, color)
+      all_pieces.concat(self.create_pawns(color))
+    end
+  end
+
+  def place_pieces(color)
+    @pieces[color].each do |piece|
+      self[piece.position] = piece
     end
   end
 
@@ -51,12 +63,32 @@ class Board
     row, col = pos
     @grid[col][row]
   end
+
+  def in_check?(color)
+    king = @pieces[color].select do |piece|
+      piece.is_a?(King)
+    end.first
+
+
+    @pieces[other_color(color)].any? do |piece|
+      piece.moves.include?(king.position)
+    end
+  end
+
+  def occupied?(pos)
+    self[pos]
+  end
+
+  def other_color(color)
+    color == :red ? :white : :red
+  end
 end
 
 board = Board.new
 puts board.display
 rook = board[[0,7]]
 horse = board[[2,0]]
-p horse.moves
+pawn = board[[1,6]]
 
+p pawn.moves
 
