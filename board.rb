@@ -1,7 +1,9 @@
 require './piece.rb'
 require 'colorize'
+require './chess_errors.rb'
 
 class Board
+  attr_accessor :grid, :pieces
 
   def initialize
     @grid = Array.new(8) { Array.new(8) { nil } }
@@ -14,12 +16,11 @@ class Board
     end
   end
 
-  def display
-    @grid.map do |row|
-      row.map do |square|
-        square == nil ? "_" : square.to_s.colorize(square.color)
-      end.join(" ")
-    end.join("\n")
+  def self.dup
+    board_copy = Board.new
+    board_copy.grid = Array.new(8) { Array.new(8) { nil } }
+    board_copy.pieces = {}
+    board_copy
   end
 
   def create_pawns(color)
@@ -39,7 +40,7 @@ class Board
       all_pieces << Bishop.new([1,col], self, color)
       all_pieces << Knight.new([2,col], self, color)
       all_pieces << Queen.new([3,col], self, color)
-      all_pieces << King.new([4,2], self, color)
+      all_pieces << King.new([4,col], self, color)
       all_pieces << Knight.new([5,col], self, color)
       all_pieces << Bishop.new([6,col], self, color)
       all_pieces << Rook.new([7,col], self, color)
@@ -47,32 +48,56 @@ class Board
     end
   end
 
-  def place_pieces(color)
-    @pieces[color].each do |piece|
-      self[piece.position] = piece
+  def dup
+    copy = Board.dup
+
+    new_red_pieces = @pieces[:red].map do |piece|
+      piece_copy = piece.dup
+      piece_copy.board = copy
+      piece_copy
     end
+
+    new_white_pieces = @pieces[:white].map do |piece|
+      piece_copy = piece.dup
+      piece_copy.board = copy
+      piece_copy
+    end
+
+    new_pieces = { :red => new_red_pieces, :white => new_white_pieces}
+    copy.pieces = new_pieces
+    new_pieces.each do |color, pieces|
+      copy.place_pieces(color)
+    end
+
+    copy.pieces = new_pieces
+    copy
   end
 
-  def []=(pos, piece)
-    row, col = pos
-    @grid[col][row] = piece
-    piece.position = pos
-  end
-
-  def [](pos)
-    row, col = pos
-    @grid[col][row]
-  end
 
   def in_check?(color)
     king = @pieces[color].select do |piece|
       piece.is_a?(King)
     end.first
 
-
     @pieces[other_color(color)].any? do |piece|
       piece.moves.include?(king.position)
     end
+  end
+
+  def move(start, end_pos)
+    raise MoveStartError.new unless self.occupied?(start)
+    raise MoveEndError.new unless self[start].moves.include?(end_pos)
+    # rescue MoveStartError => e
+#       puts "There is no piece at #{start}"
+#       retry
+#     rescue MoveEndError => e
+#       puts "#{end_pos} is not a valid position for that piece"
+#       retry
+      occupant = self[start]
+      self[end_pos] = nil
+      self[end_pos] = occupant
+      self[start] = nil
+      puts to_s
   end
 
   def occupied?(pos)
@@ -82,13 +107,52 @@ class Board
   def other_color(color)
     color == :red ? :white : :red
   end
+
+  def place_pieces(color)
+    p "self is #{self.object_id}"
+    self.pieces[color].each do |piece|
+      self[piece.position] = piece
+    end
+  end
+
+  def to_s
+    @grid.map do |row|
+      row.map do |square|
+        square == nil ? "_" : square.to_s.colorize(square.color)
+      end.join(" ")
+    end.join("\n")
+  end
+
+  def []=(pos, piece)
+    row, col = pos
+    @grid[col][row] = piece
+    piece.position = pos unless piece == nil
+  end
+
+  def [](pos)
+    row, col = pos
+    @grid[col][row]
+  end
 end
 
 board = Board.new
-puts board.display
 rook = board[[0,7]]
 horse = board[[2,0]]
 pawn = board[[1,6]]
 
-p pawn.moves
+# pawn2 = pawn.dup
+#
+# p pawn.object_id
+# p pawn2.object_id
+
+board2 = board.dup
+
+board2.move([2,0], [1,2])
+p "After the move:"
+puts board.to_s
+puts board2.to_s
+rook2 = board2[[0,7]]
+
+p "Rook has and id #{rook.board.object_id}, Rook2 has id of #{rook2.board.object_id}"
+p "board1 has and id #{board.object_id}, board has id of #{board2.object_id}"
 
