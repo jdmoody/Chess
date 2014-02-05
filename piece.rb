@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'colorize'
 
 class Piece
@@ -27,8 +29,15 @@ class Piece
 
   def move_into_check?(pos)
     dup_board = self.board.dup
-    dup_board.move(self.position, pos)
-    dup_board.in_check?(self.color) ? true : false
+    dup_board.move!(self.position, pos)
+    p dup_board.in_check?(self.color)
+  end
+
+  def valid_moves
+    all_moves = self.moves
+    all_moves.delete_if do |pos|
+      move_into_check?(pos)
+    end
   end
 end
 
@@ -94,7 +103,7 @@ class King < SteppingPiece
   end
 
   def to_s
-    "K"
+    "♔"
   end
 end
 
@@ -126,8 +135,11 @@ class Pawn < SteppingPiece
     end
 
     starting_move_dir = move_dirs.flatten.map { |i| i * 2 }
-    valid_moves << [@starting_pos[0], @starting_pos[1] + starting_move_dir[1]]
+    double_forward = [@starting_pos[0], @starting_pos[1] + starting_move_dir[1]]
 
+    unless @board.occupied?(forward) || @board.occupied?(double_forward)
+      valid_moves << double_forward
+    end
     valid_moves
   end
 
@@ -140,9 +152,3 @@ class Pawn < SteppingPiece
     "P"
   end
 end
-
-# knight = Knight.new([0,0], nil)
-# p knight.moves.inspect
-
-# queen = Bishop.new([0,0], nil, :black)
-# p queen.to_s
