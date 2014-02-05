@@ -104,8 +104,31 @@ class Knight < SteppingPiece
 end
 
 class Pawn < SteppingPiece
+  attr_reader :starting_pos
+  def initialize(position, board, color)
+    super
+    @starting_pos = position
+  end
+
+  def moves
+    valid_moves = []
+    forward = super.flatten
+    diagonals = [[forward[0] + 1, forward[1]], [forward[0] - 1, forward[1]]]
+
+    valid_moves << forward unless @board.occupied?(forward)
+    diagonals.each do |diagonal|
+      valid_moves << diagonal if @board.occupied?(diagonal)
+    end
+
+    starting_move_dir = move_dirs.flatten.map { |i| i * 2 }
+    valid_moves << [@starting_pos[0], @starting_pos[1] + starting_move_dir[1]]
+
+    valid_moves
+  end
+
   def move_dirs
-    white? ? [0, 1] : [0, -1]
+    self.color == :red ? [[0, 1]] : [[0, -1]]
+
   end
 
   def to_s
