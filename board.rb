@@ -39,7 +39,7 @@ class Board
       all_pieces << Bishop.new([1,col], self, color)
       all_pieces << Knight.new([2,col], self, color)
       all_pieces << Queen.new([3,col], self, color)
-      all_pieces << King.new([4,col], self, color)
+      all_pieces << King.new([4,2], self, color)
       all_pieces << Knight.new([5,col], self, color)
       all_pieces << Bishop.new([6,col], self, color)
       all_pieces << Rook.new([7,col], self, color)
