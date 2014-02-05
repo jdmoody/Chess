@@ -25,6 +25,14 @@ class Board
     board_copy
   end
 
+  def checkmate?(color)
+    no_valid_moves = @pieces[color].all? do |piece|
+      piece.valid_moves.empty?
+    end
+
+    in_check?(color) && no_valid_moves
+  end
+
   def create_pawns(color)
     [].tap do | pawns |
       (0...8).each do |row|
@@ -42,7 +50,7 @@ class Board
       all_pieces << Bishop.new([1,col], self, color)
       all_pieces << Knight.new([2,col], self, color)
       all_pieces << Queen.new([3,col], self, color)
-      all_pieces << King.new([4,3], self, color) if color == :white
+      all_pieces << King.new([4,col], self, color)
       all_pieces << Knight.new([5,col], self, color)
       all_pieces << Bishop.new([6,col], self, color)
       all_pieces << Rook.new([7,col], self, color)
@@ -85,25 +93,23 @@ class Board
     end
   end
 
-  def move(start, end_pos)
+  def move(start, end_pos, color)
     occupant = self[start]
-    move!(start, end_pos) if occupant.valid_moves.include?(end_pos)
+    if occupant.valid_moves.include?(end_pos)
+      move!(start, end_pos, color)
+    end
+    self
   end
 
-  def move!(start, end_pos)
-    raise MoveStartError.new unless self.occupied?(start)
-    raise MoveEndError.new unless self[start].moves.include?(end_pos)
-#     rescue MoveStartError => e
-#       puts "There is no piece at #{start}"
-#       retry
-#     rescue MoveEndError => e
-#       puts "#{end_pos} is not a valid position for that piece"
-#       retry
-      occupant = self[start]
-      self[end_pos] = nil
-      self[end_pos] = occupant
-      self[start] = nil
-      puts to_s
+  def move!(start, end_pos, color)
+    raise MoveStartError.new("#{start}") unless self.occupied?(start)
+    raise MoveEndError.new("#{end_pos}") unless self[start].moves.include?(end_pos)
+    occupant = self[start]
+    raise WrongPlayerError.new unless color == occupant.color
+    self[end_pos] = nil
+    self[end_pos] = occupant
+    self[start] = nil
+    self
   end
 
   def occupied?(pos)
@@ -140,17 +146,15 @@ class Board
   end
 end
 
-board = Board.new
-# rook = board[[0,7]]
-# horse = board[[2,0]]
-# pawn = board[[1,6]]
-#
-# puts board.to_s
-#
-# puts board.in_check?(:white)
+# board = Board.new
 
-puts board.to_s
-"Moving king:"
-king = board[[4,3]]
-p king.valid_moves
-p king.moves
+
+# # puts board.to_s
+# "Moving king:"
+# king = board[[4,3]]
+# board.move([5,1],[5,2])
+# board.move([4,6],[4,4])
+# board.move([6,1],[6,3])
+# board.move([3,7],[7,3])
+# p board.checkmate?(:red)
+# p board.display
