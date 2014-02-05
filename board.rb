@@ -3,6 +3,12 @@
 require './piece.rb'
 require 'colorize'
 require './chess_errors.rb'
+require './pawn.rb'
+require './king.rb'
+require './knight.rb'
+require './queen.rb'
+require './rook.rb'
+require './bishop.rb'
 
 class Board
   attr_accessor :grid, :pieces
@@ -60,7 +66,7 @@ class Board
 
   def convert_pos_to_coords(pos)
     letter = (pos[0] + 97).chr
-    number = 8 - pos[0]
+    number = 8 - Integer(pos[1])
     "#{letter}#{number}"
   end
   def dup
@@ -102,9 +108,10 @@ class Board
     start_coord = self.convert_pos_to_coords(start)
     end_coord = self.convert_pos_to_coords(end_pos)
     raise MoveStartError.new(start_coord) unless self.occupied?(start)
-    raise MoveEndError.new(end_coord) unless self[start].moves.include?(end_pos)
     occupant = self[start]
+
     raise WrongPlayerError.new unless color == occupant.color
+    raise MoveEndError.new(end_coord) unless self[start].moves.include?(end_pos)
     if occupant.valid_moves.include?(end_pos)
       move!(start, end_pos, color)
     end

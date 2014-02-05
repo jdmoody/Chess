@@ -59,96 +59,100 @@ class SlidingPiece < Piece
   end
 end
 
-class Bishop < SlidingPiece
-  def move_dirs
-    DIAGONALS
-  end
+# class Bishop < SlidingPiece
+#   def move_dirs
+#     DIAGONALS
+#   end
+#
+#   def to_s
+#     "B"
+#   end
+# end
 
-  def to_s
-    "B"
-  end
-end
+# class Rook < SlidingPiece
+#   def move_dirs
+#     HORIZ_VERT
+#   end
+#
+#   def to_s
+#     "R"
+#   end
+# end
 
-class Rook < SlidingPiece
-  def move_dirs
-    HORIZ_VERT
-  end
-
-  def to_s
-    "R"
-  end
-end
-
-class Queen < SlidingPiece
-  def move_dirs
-    DIAGONALS + HORIZ_VERT
-  end
-
-  def to_s
-    "Q"
-  end
-end
+# class Queen < SlidingPiece
+#   def move_dirs
+#     DIAGONALS + HORIZ_VERT
+#   end
+#
+#   def to_s
+#     "Q"
+#   end
+# end
 
 class SteppingPiece < Piece
   def moves
-    self.move_dirs.map do |pos|
-      [@position[0] + pos[0], @position[1] + pos[1]]
-    end.select { |pos| self.valid?(pos) }
+    self.move_dirs.map do |dpos|
+      # puts "change: #{dpos}"
+      # puts "original position: #{@position}"
+      [@position[0] + dpos[0], @position[1] + dpos[1]]
+    end.select { |pos| #puts "new position: #{pos}"
+    self.valid?(pos) }
   end
 end
 
-class King < SteppingPiece
-  def move_dirs
-    HORIZ_VERT + DIAGONALS
-  end
+# class King < SteppingPiece
+#   def move_dirs
+#     HORIZ_VERT + DIAGONALS
+#   end
+#
+#   def to_s
+#     "♔"
+#   end
+# end
 
-  def to_s
-    "♔"
-  end
-end
+# class Knight < SteppingPiece
+#   def move_dirs
+#     [[-1, 2], [-1, -2], [1, -2], [1, 2], [2, -1], [-2, -1], [-2, 1], [2, 1]]
+#   end
+#
+#   def to_s
+#     "H"
+#   end
+# end
 
-class Knight < SteppingPiece
-  def move_dirs
-    [[-1, 2], [-1, -2], [1, -2], [1, 2], [2, -1], [-2, -1], [-2, 1], [2, 1]]
-  end
-
-  def to_s
-    "H"
-  end
-end
-
-class Pawn < SteppingPiece
-  attr_reader :starting_pos
-  def initialize(position, board, color)
-    super
-    @starting_pos = position
-  end
-
-  def moves
-    valid_moves = []
-    forward = super.flatten
-    diagonals = [[forward[0] + 1, forward[1]], [forward[0] - 1, forward[1]]]
-
-    valid_moves << forward unless @board.occupied?(forward)
-    diagonals.each do |diagonal|
-      valid_moves << diagonal if @board.occupied?(diagonal)
-    end
-
-    starting_move_dir = move_dirs.flatten.map { |i| i * 2 }
-    double_forward = [@starting_pos[0], @starting_pos[1] + starting_move_dir[1]]
-
-    unless @board.occupied?(forward) || @board.occupied?(double_forward)
-      valid_moves << double_forward
-    end
-    valid_moves
-  end
-
-  def move_dirs
-    self.color == :red ? [[0, 1]] : [[0, -1]]
-
-  end
-
-  def to_s
-    "P"
-  end
-end
+# class Pawn < SteppingPiece
+#   attr_reader :starting_pos
+#   def initialize(position, board, color)
+#     super
+#     @starting_pos = position
+#   end
+#
+#   def moves
+#     valid_moves = []
+#     forward = super.flatten
+#     p super
+#     diagonals = [[forward[0] + 1, forward[1]], [forward[0] - 1, forward[1]]] unless forward.empty?
+#
+#     valid_moves << forward unless @board.occupied?(forward)
+#     diagonals.each do |diagonal|
+#       valid_moves << diagonal if @board.occupied?(diagonal)
+#     end
+#
+#     starting_move_dir = move_dirs.flatten.map { |i| i * 2 }
+#     double_forward = [@starting_pos[0], @starting_pos[1] + starting_move_dir[1]]
+#
+#     unless @board.occupied?(forward) || @board.occupied?(double_forward)
+#       valid_moves << double_forward
+#     end
+#     valid_moves
+#   end
+#
+#   def move_dirs
+#     self.color == :red ? [[0, 1]] : [[0, -1]]
+#
+#   end
+#
+#   def to_s
+#     "P"
+#   end
+# end
