@@ -53,12 +53,12 @@ class Board
     col = (color == :white) ? 7 : 0
     [].tap do |all_pieces|
       all_pieces << Rook.new([0,col], self, color)
-      all_pieces << Bishop.new([1,col], self, color)
-      all_pieces << Knight.new([2,col], self, color)
+      all_pieces << Knight.new([1,col], self, color)
+      all_pieces << Bishop.new([2,col], self, color)
       all_pieces << Queen.new([3,col], self, color)
       all_pieces << King.new([4,col], self, color)
-      all_pieces << Knight.new([5,col], self, color)
-      all_pieces << Bishop.new([6,col], self, color)
+      all_pieces << Bishop.new([5,col], self, color)
+      all_pieces << Knight.new([6,col], self, color)
       all_pieces << Rook.new([7,col], self, color)
       all_pieces.concat(self.create_pawns(color))
     end
