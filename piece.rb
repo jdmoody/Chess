@@ -1,7 +1,7 @@
 require 'colorize'
 
 class Piece
-  attr_accessor :position, :color
+  attr_accessor :position, :color, :board
 
   HORIZ_VERT =   [[1, 0], [-1, 0], [0,  1], [0,  -1]]
   DIAGONALS = [[1, 1], [-1, 1], [1, -1], [-1, -1]]
@@ -25,6 +25,10 @@ class Piece
     end
   end
 
+  def move_into_check?(pos)
+
+
+  end
 end
 
 class SlidingPiece < Piece
