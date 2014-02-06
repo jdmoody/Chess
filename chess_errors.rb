@@ -6,3 +6,6 @@ end
 
 class WrongPlayerError < ArgumentError
 end
+
+class MoveIntoCheckError < ArgumentError
+end

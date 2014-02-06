@@ -114,13 +114,15 @@ class Board
     raise MoveEndError.new(end_coord) unless self[start].moves.include?(end_pos)
     if occupant.valid_moves.include?(end_pos)
       move!(start, end_pos, color)
+    else raise MoveIntoCheckError.new
     end
     self
   end
 
   def move!(start, end_pos, color)
-
     occupant = self[start]
+    former_occupant = self[end_pos]
+    self.pieces[other_color(color)].delete_if { |piece| piece == former_occupant }
 
     self[end_pos] = nil
     self[end_pos] = occupant
@@ -147,7 +149,7 @@ class Board
       row.map do |square|
         square == nil ? "_" : square.to_s.colorize(square.color)
       end.join(" ")
-    end.join("\n")
+    end.join("\n") + "\n\n"
   end
 
   def []=(pos, piece)
@@ -161,16 +163,3 @@ class Board
     @grid[col][row]
   end
 end
-
-# board = Board.new
-
-
-# # puts board.to_s
-# "Moving king:"
-# king = board[[4,3]]
-# board.move([5,1],[5,2])
-# board.move([4,6],[4,4])
-# board.move([6,1],[6,3])
-# board.move([3,7],[7,3])
-# p board.checkmate?(:red)
-# p board.display
