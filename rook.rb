@@ -1,4 +1,5 @@
-require './piece.rb'
+require './sliding_piece.rb'
+
 class Rook < SlidingPiece
   def move_dirs
     HORIZ_VERT

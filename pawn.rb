@@ -1,4 +1,5 @@
-require './piece.rb'
+require './stepping_piece.rb'
+
 class Pawn < SteppingPiece
   attr_reader :starting_pos
   def initialize(position, board, color)

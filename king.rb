@@ -1,5 +1,5 @@
 # encoding: utf-8
-require './piece.rb'
+require './stepping_piece.rb'
 class King < SteppingPiece
   def move_dirs
     HORIZ_VERT + DIAGONALS
