@@ -1,4 +1,5 @@
-require './piece.rb'
+require './sliding_piece.rb'
+
 class Bishop < SlidingPiece
   def move_dirs
     DIAGONALS

@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-require './piece.rb'
 require 'colorize'
 require './chess_errors.rb'
 require './pawn.rb'
@@ -9,6 +8,7 @@ require './knight.rb'
 require './queen.rb'
 require './rook.rb'
 require './bishop.rb'
+
 
 class Board
   attr_accessor :grid, :pieces
@@ -50,16 +50,12 @@ class Board
   end
 
   def create_pieces(color)
-    col = (color == :white) ? 7 : 0
+    y = (color == :white) ? 7 : 0
     [].tap do |all_pieces|
-      all_pieces << Rook.new([0,col], self, color)
-      all_pieces << Knight.new([1,col], self, color)
-      all_pieces << Bishop.new([2,col], self, color)
-      all_pieces << Queen.new([3,col], self, color)
-      all_pieces << King.new([4,col], self, color)
-      all_pieces << Bishop.new([5,col], self, color)
-      all_pieces << Knight.new([6,col], self, color)
-      all_pieces << Rook.new([7,col], self, color)
+      piece_classes = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+      piece_classes.map.with_index do |piece, x|
+        all_pieces << piece.new([x, y], self, color)
+      end
       all_pieces.concat(self.create_pawns(color))
     end
   end

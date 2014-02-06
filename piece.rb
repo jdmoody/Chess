@@ -43,7 +43,6 @@ class Piece
     all_moves.delete_if do |pos|
       self.move_into_check?(pos)
     end
-    puts "all moves: #{all_moves}"
     all_moves
   end
 
@@ -54,31 +53,5 @@ class Piece
   end
 end
 
-class SlidingPiece < Piece
-
-  def moves
-    all_positions = []
-    self.move_dirs.map do |pos_change|
-      new_pos = @position.dup
-      loop do
-        new_pos = new_pos.dup
-        new_pos[0] += pos_change[0]
-        new_pos[1] += pos_change[1]
-        break unless self.valid?(new_pos)
-        all_positions << new_pos
-        break if self.capture?(new_pos)
-      end
-    end
-    all_positions.sort
-
-  end
-end
 
 
-class SteppingPiece < Piece
-  def moves
-    self.move_dirs.map do |dpos|
-      [@position[0] + dpos[0], @position[1] + dpos[1]]
-    end.select { |pos| self.valid?(pos) }
-  end
-end

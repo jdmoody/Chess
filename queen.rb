@@ -1,4 +1,5 @@
-require './piece.rb'
+require './sliding_piece.rb'
+
 class Queen < SlidingPiece
   def move_dirs
     DIAGONALS + HORIZ_VERT
