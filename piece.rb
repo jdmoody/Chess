@@ -21,6 +21,11 @@ class Piece
     occupant.color == self.color ? false : true
   end
 
+  def capture?(new_pos)
+    occupant = @board[new_pos]
+    return true if occupant && occupant.color != self.color
+  end
+
   def in_bounds(new_pos)
     new_pos.all? do |row_or_col|
       row_or_col.between?(0, 7)
@@ -36,8 +41,16 @@ class Piece
   def valid_moves
     all_moves = self.moves
     all_moves.delete_if do |pos|
-      move_into_check?(pos)
+      self.move_into_check?(pos)
     end
+    puts "all moves: #{all_moves}"
+    all_moves
+  end
+
+  def vertically_sum(position, change)
+    new_position = position.dup
+    new_position.zip(change)
+    .map { |pos, change| pos + change }
   end
 end
 
@@ -53,41 +66,14 @@ class SlidingPiece < Piece
         new_pos[1] += pos_change[1]
         break unless self.valid?(new_pos)
         all_positions << new_pos
+        break if self.capture?(new_pos)
       end
     end
     all_positions.sort
+
   end
 end
 
-# class Bishop < SlidingPiece
-#   def move_dirs
-#     DIAGONALS
-#   end
-#
-#   def to_s
-#     "B"
-#   end
-# end
-
-# class Rook < SlidingPiece
-#   def move_dirs
-#     HORIZ_VERT
-#   end
-#
-#   def to_s
-#     "R"
-#   end
-# end
-
-# class Queen < SlidingPiece
-#   def move_dirs
-#     DIAGONALS + HORIZ_VERT
-#   end
-#
-#   def to_s
-#     "Q"
-#   end
-# end
 
 class SteppingPiece < Piece
   def moves
@@ -96,60 +82,3 @@ class SteppingPiece < Piece
     end.select { |pos| self.valid?(pos) }
   end
 end
-
-# class King < SteppingPiece
-#   def move_dirs
-#     HORIZ_VERT + DIAGONALS
-#   end
-#
-#   def to_s
-#     "♔"
-#   end
-# end
-
-# class Knight < SteppingPiece
-#   def move_dirs
-#     [[-1, 2], [-1, -2], [1, -2], [1, 2], [2, -1], [-2, -1], [-2, 1], [2, 1]]
-#   end
-#
-#   def to_s
-#     "H"
-#   end
-# end
-
-# class Pawn < SteppingPiece
-#   attr_reader :starting_pos
-#   def initialize(position, board, color)
-#     super
-#     @starting_pos = position
-#   end
-#
-#   def moves
-#     valid_moves = []
-#     forward = super.flatten
-#     p super
-#     diagonals = [[forward[0] + 1, forward[1]], [forward[0] - 1, forward[1]]] unless forward.empty?
-#
-#     valid_moves << forward unless @board.occupied?(forward)
-#     diagonals.each do |diagonal|
-#       valid_moves << diagonal if @board.occupied?(diagonal)
-#     end
-#
-#     starting_move_dir = move_dirs.flatten.map { |i| i * 2 }
-#     double_forward = [@starting_pos[0], @starting_pos[1] + starting_move_dir[1]]
-#
-#     unless @board.occupied?(forward) || @board.occupied?(double_forward)
-#       valid_moves << double_forward
-#     end
-#     valid_moves
-#   end
-#
-#   def move_dirs
-#     self.color == :red ? [[0, 1]] : [[0, -1]]
-#
-#   end
-#
-#   def to_s
-#     "P"
-#   end
-# end

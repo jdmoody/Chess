@@ -1,5 +1,5 @@
 require './board.rb'
-
+require 'debugger'
 class Game
 
   def initialize
@@ -12,7 +12,10 @@ class Game
     until game_over?
       puts @board.to_s
       begin
-        puts "#{@current_player.color}'s turn!"
+        puts "#{@current_player.color.to_s.capitalize}'s turn!"
+        if @board.in_check?(@current_player.color)
+          puts "Careful, you're in check!"
+        end
         start_coord, end_coord = @current_player.play_turn
         start_pos = convert_coords_to_pos(start_coord)
         end_pos = convert_coords_to_pos(end_coord)
@@ -25,8 +28,11 @@ class Game
       rescue MoveEndError => e
         puts "#{e.message} is not a valid position for that piece."
         retry
-      rescue WrongPlayerError => e
+      rescue WrongPlayerError
         puts "You cannot move the other player's pieces."
+        retry
+      rescue MoveIntoCheckError
+        puts "That move would put you into check. Try Again."
         retry
       end
        self.switch_player
