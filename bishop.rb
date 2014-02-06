@@ -1,3 +1,4 @@
+# encoding: utf-8
 require './sliding_piece.rb'
 
 class Bishop < SlidingPiece
@@ -6,6 +7,6 @@ class Bishop < SlidingPiece
   end
 
   def to_s
-    "B"
+    "♗"
   end
 end

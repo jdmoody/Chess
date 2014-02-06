@@ -1,3 +1,4 @@
+# encoding: utf-8
 require './stepping_piece.rb'
 
 class Knight < SteppingPiece
@@ -6,6 +7,6 @@ class Knight < SteppingPiece
   end
 
   def to_s
-    "H"
+    "♘"
   end
 end

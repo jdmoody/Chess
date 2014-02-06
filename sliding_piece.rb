@@ -7,9 +7,7 @@ class SlidingPiece < Piece
     self.move_dirs.map do |pos_change|
       new_pos = @position.dup
       loop do
-        new_pos = new_pos.dup
-        new_pos[0] += pos_change[0]
-        new_pos[1] += pos_change[1]
+        new_pos = vertically_sum(new_pos, pos_change)
         break unless self.valid?(new_pos)
         all_positions << new_pos
         break if self.capture?(new_pos)

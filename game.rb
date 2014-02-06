@@ -1,4 +1,5 @@
 require './board.rb'
+require 'yaml'
 require 'debugger'
 class Game
 
@@ -16,11 +17,17 @@ class Game
         if @board.in_check?(@current_player.color)
           puts "Careful, you're in check!"
         end
-        start_coord, end_coord = @current_player.play_turn
-        start_pos = convert_coords_to_pos(start_coord)
-        end_pos = convert_coords_to_pos(end_coord)
+        player_response = @current_player.play_turn
+        if player_response == 's'
+          puts "and Im getting here "
+          self.save_game
+        else
+          start_coord, end_coord = player_response
+          start_pos = convert_coords_to_pos(start_coord)
+          end_pos = convert_coords_to_pos(end_coord)
 
-        @board.move(start_pos, end_pos, @current_player.color)
+          @board.move(start_pos, end_pos, @current_player.color)
+        end
       rescue MoveStartError => e
         pos = e.message.split(",")
         puts "There is no piece at #{e.message}"
@@ -41,6 +48,16 @@ class Game
     puts @board.to_s
     p "Game over! The winner is #{@current_player.color}"
 
+  end
+
+  def save_game
+    puts "Enter filename: "
+    filename = "#{gets.chomp}.yml"
+
+    File.open(filename, "w") do | f |
+      f.puts(self.to_yaml)
+    end
+    exit
 
   end
 
@@ -48,7 +65,9 @@ class Game
     @board.checkmate?(@current_player.color)
   end
 
+  def save
 
+  end
   def switch_player
     @current_player = (@current_player == @player_1 ? @player_2 : @player_1)
   end
@@ -71,9 +90,13 @@ class Player
   end
 
   def play_turn
-    puts "Enter the positions you would like to move from and to (e.g. 'a2, a3'):"
+    puts "Enter a move (a2, a3) or type 's' to save a game:"
     begin
-      start, end_pos = gets.chomp.split(",")
+      response = gets.chomp
+      puts "the response was #{response}"
+      return 's' if response.downcase == 's'
+      puts "but i didn't retrun...."
+      start, end_pos = response.split(",")
 
       *pos = start.strip.split(""), end_pos.strip.split("")
 

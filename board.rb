@@ -90,7 +90,6 @@ class Board
     copy
   end
 
-
   def in_check?(color)
     king = @pieces[color].select do |piece|
       piece.is_a?(King)
@@ -103,22 +102,25 @@ class Board
   def move(start, end_pos, color)
     start_coord = self.convert_pos_to_coords(start)
     end_coord = self.convert_pos_to_coords(end_pos)
-    raise MoveStartError.new(start_coord) unless self.occupied?(start)
-    occupant = self[start]
 
+    occupant = self[start]
+    raise MoveStartError.new(start_coord) unless self.occupied?(start)
     raise WrongPlayerError.new unless color == occupant.color
     raise MoveEndError.new(end_coord) unless self[start].moves.include?(end_pos)
     if occupant.valid_moves.include?(end_pos)
       move!(start, end_pos, color)
     else raise MoveIntoCheckError.new
     end
+
     self
   end
 
   def move!(start, end_pos, color)
     occupant = self[start]
     former_occupant = self[end_pos]
-    self.pieces[other_color(color)].delete_if { |piece| piece == former_occupant }
+    self.pieces[other_color(color)].delete_if do |piece|
+      piece == former_occupant
+    end
 
     self[end_pos] = nil
     self[end_pos] = occupant
@@ -141,11 +143,21 @@ class Board
   end
 
   def to_s
-    @grid.map do |row|
-      row.map do |square|
-        square == nil ? "_" : square.to_s.colorize(square.color)
-      end.join(" ")
-    end.join("\n") + "\n\n"
+    row_number = 8
+    grid_string = @grid.map.with_index do |row, x_idx|
+      row_string = row.map.with_index do |square, y_idx|
+        color = ((x_idx + y_idx) % 2 == 0 ? :black : :green)
+        if square == nil
+          "   ".colorize( :background => color)
+        else
+          " #{square.to_s} ".colorize(:color => square.color, :background => color)
+        end
+      end.join("")
+      row_string = "#{row_number} " + row_string + " #{row_number}"
+      row_number -= 1
+      row_string
+    end.join("\n") + "\n"
+    "\n   a  b  c  d  e  f  g  h\n" + grid_string + "   a  b  c  d  e  f  g  h\n\n"
   end
 
   def []=(pos, piece)

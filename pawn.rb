@@ -1,3 +1,4 @@
+# encoding: utf-8
 require './stepping_piece.rb'
 
 class Pawn < SteppingPiece
@@ -36,6 +37,6 @@ class Pawn < SteppingPiece
   end
 
   def to_s
-    "P"
+    "♙"
   end
 end
