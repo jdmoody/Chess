@@ -2,7 +2,7 @@ require './board.rb'
 require 'yaml'
 require 'debugger'
 class Game
-
+  attr_accessor :board
   def initialize
     @board = Board.new
     @player_1, @player_2 = Player.new(:white), Player.new(:red)
@@ -10,6 +10,17 @@ class Game
   end
 
   def play
+
+    puts "Would you like to start a [n]ew game of [l]oad a previous game?"
+    response = gets.chomp
+    if response.downcase == 'l'
+      puts "What is the name of your file?"
+      filename = gets.chomp
+      loaded_game_board = self.load_game(filename)
+      self.board = loaded_game_board
+    end
+
+
     until game_over?
       puts @board.to_s
       begin
@@ -50,12 +61,16 @@ class Game
 
   end
 
+  def load_game(filename)
+    YAML.load_file("#{filename}.yml")
+  end
+
   def save_game
     puts "Enter filename: "
     filename = "#{gets.chomp}.yml"
 
     File.open(filename, "w") do | f |
-      f.puts(self.to_yaml)
+      f.puts(self.board.to_yaml)
     end
     exit
 
