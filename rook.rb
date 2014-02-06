@@ -1,3 +1,4 @@
+# encoding: utf-8
 require './sliding_piece.rb'
 
 class Rook < SlidingPiece
@@ -6,6 +7,6 @@ class Rook < SlidingPiece
   end
 
   def to_s
-    "R"
+    "♖"
   end
 end

@@ -1,3 +1,4 @@
+# encoding: utf-8
 require './sliding_piece.rb'
 
 class Queen < SlidingPiece
@@ -6,6 +7,6 @@ class Queen < SlidingPiece
   end
 
   def to_s
-    "Q"
+    "♕"
   end
 end
